@@ -5,7 +5,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,10 +17,11 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup Theos & iOS SDK
-        uses: theos/setup-theos@v1
-        with:
-          sdk: iphoneos
+      - name: Install Theos & iOS SDKs
+        run: |
+          git clone --recursive https://github.com/theos/theos.git $GITHUB_WORKSPACE/theos
+          git clone --depth=1 https://github.com/theos/sdks.git $GITHUB_WORKSPACE/theos/sdks
+          echo "THEOS=$GITHUB_WORKSPACE/theos" >> $GITHUB_ENV
 
       - name: Compile and Package
         run: |
@@ -32,4 +33,3 @@ jobs:
         with:
           name: XGesture-Deb-Package
           path: packages/*.deb
-          
